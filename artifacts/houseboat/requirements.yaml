@@ -1,0 +1,29 @@
+packages:
+  "framer-motion": "For elegant, premium page transitions and scroll animations matching a luxury resort feel"
+  "react-hook-form": "For complex form state management in admin and guest inquiry/blog submissions"
+  "@hookform/resolvers": "To use Zod schemas with react-hook-form"
+  "date-fns": "For formatting blog post and gallery dates beautifully"
+  "clsx": "For conditional class names in UI components"
+  "tailwind-merge": "For merging tailwind classes safely in UI components"
+
+images:
+  - path: "artifacts/houseboat/public/images/hero.png"
+    description: "Luxurious wooden houseboat sailing on calm golden waters at sunset in Goa, cinematic lighting, premium tropical resort feel, hyperrealistic, wide angle"
+    aspect_ratio: "16:9"
+  - path: "artifacts/houseboat/public/images/bedroom.png"
+    description: "Elegant premium bedroom inside a luxurious wooden houseboat, crisp white linens, warm golden lighting, large window showing ocean view, tropical luxury"
+    aspect_ratio: "16:9"
+  - path: "artifacts/houseboat/public/images/dining.png"
+    description: "Gourmet dining setup on the top wooden deck of a luxurious houseboat, sunset, romantic string lighting, tropical resort style dining experience"
+    aspect_ratio: "16:9"
+  - path: "artifacts/houseboat/public/images/activities.png"
+    description: "People kayaking near a beautiful wooden houseboat in Goa, clear blue water, sunny day, vibrant tropical colors"
+    aspect_ratio: "16:9"
+  - path: "artifacts/houseboat/public/images/about.png"
+    description: "Aerial view of a beautiful traditional wooden houseboat cruising through lush green backwaters of Goa, golden hour, cinematic"
+    aspect_ratio: "16:9"
+
+notes:
+  - Using generated API hooks from @workspace/api-client-react
+  - wouter for routing
+  - Admin protected routes require checking useGetMe()
