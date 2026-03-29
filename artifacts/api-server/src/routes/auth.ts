@@ -30,7 +30,10 @@ function sessionCookieOptions(): CookieOptions {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
     sameSite: IS_PROD ? "none" : "lax",
-    secure: IS_PROD, // sameSite:"none" requires secure:true (HTTPS)
+    secure: IS_PROD,
+    // If COOKIE_DOMAIN is set (e.g. .shubhangihouseboatgoa.com), the cookie
+    // is shared across all subdomains of that root domain.
+    ...(process.env.COOKIE_DOMAIN ? { domain: process.env.COOKIE_DOMAIN } : {}),
   };
 }
 
