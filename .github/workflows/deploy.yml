@@ -1,0 +1,78 @@
+name: Deploy Frontend to cPanel
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+    steps:
+      # 📦 Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 🟢 Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 📥 Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # 📥 Install all workspace dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # 🏗️ Build frontend
+      - name: Build frontend
+        run: pnpm --filter @workspace/houseboat build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      # ✅ Verify build output exists
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          if [ ! -d "artifacts/houseboat/dist/public" ]; then
+            echo "❌ artifacts/houseboat/dist/public does not exist"
+            exit 1
+          fi
+          if [ -z "$(ls -A artifacts/houseboat/dist/public)" ]; then
+            echo "❌ artifacts/houseboat/dist/public is empty"
+            exit 1
+          fi
+          echo "✅ Build output exists and has files"
+          ls -la artifacts/houseboat/dist/public
+
+      # 🔍 Print deploy values (safe debug)
+      - name: Print deploy values
+        run: |
+          echo "---- DEPLOY DEBUG ----"
+          echo "LOCAL_DIR  = artifacts/houseboat/dist/public/"
+          echo "SERVER_DIR = /"
+          echo "FTP_PORT   = 21"
+          echo "VITE_API_URL set? -> ${{ secrets.VITE_API_URL != '' }}"
+          echo "FTP_SERVER set?   -> ${{ secrets.FTP_SERVER != '' }}"
+          echo "FTP_USERNAME set? -> ${{ secrets.FTP_USERNAME != '' }}"
+          echo "FTP_PASSWORD set? -> ${{ secrets.FTP_PASSWORD != '' }}"
+
+      # 🚀 Deploy to cPanel via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          local-dir: artifacts/houseboat/dist/public/
+          server-dir: /
+          dangerous-clean-slate: true
+          log-level: verbose
