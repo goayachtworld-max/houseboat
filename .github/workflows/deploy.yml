@@ -33,7 +33,7 @@ jobs:
       - name: Build frontend
         run: pnpm --filter @workspace/houseboat build
         env:
-          VITE_API_URL: https://api.goaboat.com/boathouse
+          VITE_API_URL: https://api.shubhangihouseboatgoa.com/boathouse
 
       # ✅ Verify build output exists
       - name: Verify build output
