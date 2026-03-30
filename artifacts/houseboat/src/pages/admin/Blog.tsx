@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import {
   useListPendingBlogPosts, useListBlogPosts, useApproveBlogPost, useDeleteBlogPost,
   getListPendingBlogPostsQueryKey, getListBlogPostsQueryKey
@@ -387,7 +388,7 @@ export default function AdminBlog() {
 
     setPosting(true);
     try {
-      const res = await fetch(`${API}/admin/blog`, { credentials: "include", 
+      const res = await fetch(`${API}/admin/blog`, { ...authHeaders(), 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

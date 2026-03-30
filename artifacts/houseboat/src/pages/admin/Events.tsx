@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -70,7 +71,7 @@ export default function AdminEvents() {
   const { data: events = [], isLoading } = useQuery<BoatEvent[]>({
     queryKey: ["admin-events"],
     queryFn: async () => {
-      const res = await fetch(`${API}/events`, { credentials: "include" });
+      const res = await fetch(`${API}/events`, { ...authHeaders() });
       return res.json();
     },
   });
@@ -130,11 +131,10 @@ export default function AdminEvents() {
 
   const uploadImageToServer = async (dataUrl: string): Promise<string | null> => {
     if (!dataUrl.startsWith("data:")) return dataUrl;
-    const res = await fetch(`${API}/gallery/upload-base64`, {
-      credentials: "include",
+    const res = await fetch(`${API}/gallery/upload-base64`, { ...authHeaders(), 
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // credentials: "include",
+      ...authHeaders(),
       body: JSON.stringify({ image: dataUrl }),
     });
     if (!res.ok) return null;
@@ -159,11 +159,10 @@ export default function AdminEvents() {
     const url = editingId ? `${API}/events/${editingId}` : `${API}/events`;
     const method = editingId ? "PATCH" : "POST";
 
-    const res = await fetch(url, {
-      credentials: "include",
+    const res = await fetch(url, { ...authHeaders(),
       method,
       headers: { "Content-Type": "application/json" },
-      // credentials: "include",
+      ...authHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -178,11 +177,10 @@ export default function AdminEvents() {
   };
 
   const toggleActive = async (event: BoatEvent) => {
-    await fetch(`${API}/events/${event.id}`, {
-      credentials: "include",
+    await fetch(`${API}/events/${event.id}`, { ...authHeaders(), 
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      // credentials: "include",
+      ...authHeaders(),
       body: JSON.stringify({ isActive: !event.isActive }),
     });
     queryClient.invalidateQueries({ queryKey: ["admin-events"] });

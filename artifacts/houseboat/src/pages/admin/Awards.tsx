@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,7 @@ export default function AdminAwards() {
   const { data: awards = [], isLoading } = useQuery<Award[]>({
     queryKey: AWARDS_KEY,
     queryFn: async () => {
-      const res = await fetch(`${API}/awards`, { credentials: "include" });
+      const res = await fetch(`${API}/awards`, { ...authHeaders() });
       return res.json();
     },
   });
@@ -97,8 +98,8 @@ export default function AdminAwards() {
         image: imageChanged ? imagePreview || null : undefined,
       };
       const res = editingId !== null
-        ? await fetch(`${API}/awards/${editingId}`, { credentials: "include",  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-        : await fetch(`${API}/awards`, { credentials: "include",  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, image: imagePreview || undefined }) });
+        ? await fetch(`${API}/awards/${editingId}`, { ...authHeaders(),  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        : await fetch(`${API}/awards`, { ...authHeaders(),  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, image: imagePreview || undefined }) });
       if (!res.ok) throw new Error();
       queryClient.invalidateQueries({ queryKey: AWARDS_KEY });
       toast({ title: editingId !== null ? "Award updated" : "Award added" });
@@ -111,7 +112,7 @@ export default function AdminAwards() {
   };
 
   const toggleActive = async (a: Award) => {
-    const res = await fetch(`${API}/awards/${a.id}`, { credentials: "include", 
+    const res = await fetch(`${API}/awards/${a.id}`, { ...authHeaders(), 
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isActive: !a.isActive }),
@@ -121,7 +122,7 @@ export default function AdminAwards() {
 
   const handleDelete = async (a: Award) => {
     if (!confirm(`Delete "${a.title}"?`)) return;
-    const res = await fetch(`${API}/awards/${a.id}`, { credentials: "include",  method: "DELETE" });
+    const res = await fetch(`${API}/awards/${a.id}`, { ...authHeaders(),  method: "DELETE" });
     if (res.ok) {
       queryClient.invalidateQueries({ queryKey: AWARDS_KEY });
       toast({ title: "Award deleted" });

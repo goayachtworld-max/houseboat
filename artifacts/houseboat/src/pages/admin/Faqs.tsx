@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +37,7 @@ export default function AdminFaqs() {
   const { data: faqs = [], isLoading } = useQuery<Faq[]>({
     queryKey: FAQS_KEY,
     queryFn: async () => {
-      const res = await fetch(`${API}/faqs`, { credentials: "include" });
+      const res = await fetch(`${API}/faqs`, { ...authHeaders() });
       return res.json();
     },
   });
@@ -71,8 +72,8 @@ export default function AdminFaqs() {
     try {
       const payload = { ...form, sortOrder: Number(form.sortOrder) };
       const res = editingId !== null
-        ? await fetch(`${API}/faqs/${editingId}`, { credentials: "include",  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-        : await fetch(`${API}/faqs`, { credentials: "include",  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        ? await fetch(`${API}/faqs/${editingId}`, { ...authHeaders(),  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        : await fetch(`${API}/faqs`, { ...authHeaders(),  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error();
       queryClient.invalidateQueries({ queryKey: FAQS_KEY });
       toast({ title: editingId !== null ? "FAQ updated" : "FAQ added" });
@@ -85,7 +86,7 @@ export default function AdminFaqs() {
   };
 
   const toggleActive = async (f: Faq) => {
-    await fetch(`${API}/faqs/${f.id}`, { credentials: "include", 
+    await fetch(`${API}/faqs/${f.id}`, { ...authHeaders(), 
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isActive: !f.isActive }),
@@ -95,7 +96,7 @@ export default function AdminFaqs() {
 
   const handleDelete = async (f: Faq) => {
     if (!confirm(`Delete this FAQ?\n\n"${f.question}"`)) return;
-    const res = await fetch(`${API}/faqs/${f.id}`, { credentials: "include",  method: "DELETE" });
+    const res = await fetch(`${API}/faqs/${f.id}`, { ...authHeaders(),  method: "DELETE" });
     if (res.ok) {
       queryClient.invalidateQueries({ queryKey: FAQS_KEY });
       toast({ title: "FAQ deleted" });
@@ -107,7 +108,7 @@ export default function AdminFaqs() {
     setSeeding(true);
     try {
       for (let i = 0; i < DEFAULT_FAQS.length; i++) {
-        await fetch(`${API}/faqs`, { credentials: "include", 
+        await fetch(`${API}/faqs`, { ...authHeaders(), 
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...DEFAULT_FAQS[i], sortOrder: faqs.length + i, isActive: true }),

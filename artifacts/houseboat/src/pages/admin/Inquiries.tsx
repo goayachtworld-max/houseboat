@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,7 @@ export default function AdminInquiries() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/inquiries`, { credentials: "include" });
+      const res = await fetch(`${API}/inquiries`, { ...authHeaders() });
       const data = await res.json();
       setInquiries(data.sort((a: Inquiry, b: Inquiry) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -72,7 +73,7 @@ export default function AdminInquiries() {
   const updateStatus = async (id: number, status: Status) => {
     setUpdatingId(id);
     try {
-      const res = await fetch(`${API}/inquiries/${id}`, { credentials: "include", 
+      const res = await fetch(`${API}/inquiries/${id}`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),

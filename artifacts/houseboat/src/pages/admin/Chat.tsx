@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Send, X, User, Bot, Circle, Clock, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -57,7 +58,7 @@ export default function AdminChat() {
   // Load sessions
   const fetchSessions = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/chat/sessions`, { credentials: "include" });
+      const res = await fetch(`${API}/chat/sessions`, { ...authHeaders() });
       if (res.ok) setSessions(await res.json());
     } catch {}
   }, []);
@@ -103,7 +104,7 @@ export default function AdminChat() {
     if (!selectedToken) { setMessages([]); return; }
     setUnreadMap(u => { const n = { ...u }; delete n[selectedToken]; return n; });
 
-    fetch(`${API}/chat/session/${selectedToken}/messages`, { credentials: "include" })
+    fetch(`${API}/chat/session/${selectedToken}/messages`, { ...authHeaders() })
       .then(r => r.ok ? r.json() : [])
       .then((msgs: Message[]) => setMessages(msgs))
       .catch(() => {});
@@ -130,7 +131,7 @@ export default function AdminChat() {
     setMessages(prev => [...prev, optimistic]);
 
     try {
-      await fetch(`${API}/chat/session/${selectedToken}/messages`, { credentials: "include", 
+      await fetch(`${API}/chat/session/${selectedToken}/messages`, { ...authHeaders(), 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, sender: "admin" }),
@@ -142,7 +143,7 @@ export default function AdminChat() {
 
   const closeSession = async (token: string) => {
     try {
-      await fetch(`${API}/chat/session/${token}/close`, { credentials: "include",  method: "PATCH" });
+      await fetch(`${API}/chat/session/${token}/close`, { ...authHeaders(),  method: "PATCH" });
       if (selectedToken === token) setSelectedToken(null);
       fetchSessions();
     } catch {}

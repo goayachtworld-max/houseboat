@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -238,7 +239,7 @@ export default function AdminSettings() {
   const saveLogo = async () => {
     setLogoSaving(true);
     try {
-      const res = await fetch(`${API}/settings`, { credentials: "include", 
+      const res = await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ siteLogo: logoPreview }),
@@ -264,7 +265,7 @@ export default function AdminSettings() {
   const saveNavMenu = async () => {
     setNavSaving(true);
     try {
-      const res = await fetch(`${API}/settings`, { credentials: "include", 
+      const res = await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ navHiddenItems: hiddenItems }),
@@ -283,7 +284,7 @@ export default function AdminSettings() {
   const saveWidgets = async () => {
     setWidgetSaving(true);
     try {
-      const res = await fetch(`${API}/settings`, { credentials: "include", 
+      const res = await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -331,7 +332,7 @@ export default function AdminSettings() {
     setSmtpSaving(true);
     setTestResult(null);
     try {
-      const res = await fetch(`${API}/settings`, { credentials: "include", 
+      const res = await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(smtpForm),
@@ -351,12 +352,12 @@ export default function AdminSettings() {
     setTestResult(null);
     // Save first, then test
     try {
-      await fetch(`${API}/settings`, { credentials: "include", 
+      await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(smtpForm),
       });
-      const res = await fetch(`${API}/email/test`, { credentials: "include",  method: "POST" });
+      const res = await fetch(`${API}/email/test`, { ...authHeaders(),  method: "POST" });
       const data = await res.json();
       if (res.ok && data.success) {
         setTestResult({ ok: true, msg: "Test email sent! Check your inbox." });
@@ -383,7 +384,7 @@ export default function AdminSettings() {
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({ resolver: zodResolver(passwordSchema) });
 
   useEffect(() => {
-    fetch(`${API}/auth/me`, { credentials: "include" })
+    fetch(`${API}/auth/me`, { ...authHeaders() })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data) {
@@ -403,7 +404,7 @@ export default function AdminSettings() {
   const onProfileSubmit = async (data: z.infer<typeof profileSchema>) => {
     setProfileSaving(true);
     try {
-      const res = await fetch(`${API}/auth/profile`, { credentials: "include", 
+      const res = await fetch(`${API}/auth/profile`, { ...authHeaders(), 
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -422,7 +423,7 @@ export default function AdminSettings() {
   const onPasswordSubmit = async (data: z.infer<typeof passwordSchema>) => {
     setPasswordSaving(true);
     try {
-      const res = await fetch(`${API}/auth/profile`, { credentials: "include", 
+      const res = await fetch(`${API}/auth/profile`, { ...authHeaders(), 
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword: data.currentPassword, newPassword: data.newPassword }),
@@ -441,10 +442,10 @@ export default function AdminSettings() {
   const saveDeploymentSettings = async () => {
     setDeploySaving(true);
     try {
-      const res = await fetch(`${API}/settings`, { credentials: "include", 
+      const res = await fetch(`${API}/settings`, { ...authHeaders(), 
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        // credentials: "include",
+        ...authHeaders(),
         body: JSON.stringify({
           dbType,
           dbHost,

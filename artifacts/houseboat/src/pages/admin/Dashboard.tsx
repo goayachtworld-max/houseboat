@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useListPackages, useListActivities } from "@workspace/api-client-react";
 import {
   MessageSquare, CheckCircle2, Flag, CalendarClock,
@@ -63,8 +64,8 @@ export default function AdminDashboard() {
   const [modalType, setModalType] = useState<ModalType>(null);
 
   useEffect(() => {
-    fetch(`${API}/bookings`, { credentials: "include" }).then(r => r.ok ? r.json() : []).then(setBookings).catch(() => {});
-    fetch(`${API}/inquiries`, { credentials: "include" }).then(r => r.ok ? r.json() : []).then(setInquiries).catch(() => {});
+    fetch(`${API}/bookings`, { ...authHeaders() }).then(r => r.ok ? r.json() : []).then(setBookings).catch(() => {});
+    fetch(`${API}/inquiries`, { ...authHeaders() }).then(r => r.ok ? r.json() : []).then(setInquiries).catch(() => {});
   }, []);
 
   const confirmedBookings = bookings.filter(b => b.status === "confirmed" && b.checkOut >= todayStr);

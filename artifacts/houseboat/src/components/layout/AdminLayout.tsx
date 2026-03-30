@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import {
   LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon,
@@ -35,7 +36,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/settings`, { credentials: "include" })
+    fetch(`${API}/settings`, { ...authHeaders() })
       .then(r => r.json())
       .then(d => {
         if (d.siteName) setSiteName(d.siteName);
@@ -54,7 +55,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    window.location.href = "/admin/login";
+    window.location.replace("/admin/login");
     return null;
   }
 

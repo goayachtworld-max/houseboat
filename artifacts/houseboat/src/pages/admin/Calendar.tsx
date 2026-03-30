@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { authHeaders } from "@/hooks/use-admin-auth";
 import { ChevronLeft, ChevronRight, Plus, X, Trash2, Edit2, Users, Phone, Mail, CalendarDays, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,7 +97,7 @@ export default function AdminCalendar() {
   const fetchCalendar = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API}/bookings/calendar/${monthStr}`, { credentials: "include" });
+      const res = await fetch(`${API}/bookings/calendar/${monthStr}`, { ...authHeaders() });
       const data = await res.json();
       setCalendarData(data);
     } catch (e) {
@@ -170,7 +171,7 @@ export default function AdminCalendar() {
     try {
       const url = editingBooking ? `${API}/bookings/${editingBooking.id}` : `${API}/bookings`;
       const method = editingBooking ? "PUT" : "POST";
-      const res = await fetch(url, { credentials: "include",
+      const res = await fetch(url, { ...authHeaders(),
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, guests: Number(form.guests), kids: Number(form.kids) }),
@@ -189,11 +190,11 @@ export default function AdminCalendar() {
   async function handleDelete(id: number) {
     if (!confirm("Delete this booking?")) return;
     try {
-      await fetch(`${API}/bookings/${id}`, { credentials: "include",  method: "DELETE" });
+      await fetch(`${API}/bookings/${id}`, { ...authHeaders(),  method: "DELETE" });
       toast({ title: "Deleted", description: "Booking removed." });
       fetchCalendar();
       if (selectedDate) {
-        const updated = await fetch(`${API}/bookings/calendar/${monthStr}`, { credentials: "include" });
+        const updated = await fetch(`${API}/bookings/calendar/${monthStr}`, { ...authHeaders() });
         setCalendarData(await updated.json());
       }
     } catch {
